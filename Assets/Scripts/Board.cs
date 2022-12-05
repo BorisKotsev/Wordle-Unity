@@ -4,7 +4,8 @@ using TMPro;
 
 public class Board : MonoBehaviour
 {
-    private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[] {
+    private static readonly KeyCode[] SUPPORTED_KEYS = new KeyCode[] 
+    {
         KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, KeyCode.E, KeyCode.F,
         KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L,
         KeyCode.M, KeyCode.N, KeyCode.O, KeyCode.P, KeyCode.Q, KeyCode.R,
@@ -12,17 +13,16 @@ public class Board : MonoBehaviour
         KeyCode.Y, KeyCode.Z,
     };
 
-    [Header("States")]
     public Tile.State emptyState;
     public Tile.State occupiedState;
     public Tile.State correctState;
     public Tile.State wrondSpotState;
     public Tile.State incorrectState;
 
-    [Header("UI")]
     public TextMeshProUGUI invalidWordText;
+    public TextMeshProUGUI giveUpText;
     public Button newWordBtn;
-    public Button tryAgainBtn;
+    public Button giveUpBtn;
 
     private int rowIndex, colIndex;
 
@@ -47,15 +47,28 @@ public class Board : MonoBehaviour
     {
         clearBoard();
         setRandomWord();
-
+        
         enabled = true;
     } 
 
-    public void tryAgain()
+    public void giveUp()
     {
-        clearBoard();
-        
-        enabled = true;
+        if(rowIndex < rows.Length)
+        {
+            giveUpText.text = "The word is ";
+            giveUpText.gameObject.SetActive(true);
+            giveUpText.text += word;
+            
+            enabled = true;
+
+            newWordBtn.gameObject.SetActive(true);
+        }
+        else
+        {
+            giveUpText.text = "The word is ";
+            giveUpText.gameObject.SetActive(true);
+            giveUpText.text += word;
+        }
     }
 
     private void loadData()
@@ -110,6 +123,8 @@ public class Board : MonoBehaviour
 
     private void submitRow(Row row)
     {
+        giveUpBtn.gameObject.SetActive(true);
+
         if(!isValidWord(row.word))
         {
             invalidWordText.gameObject.SetActive(true);
@@ -174,6 +189,8 @@ public class Board : MonoBehaviour
 
     private void clearBoard()
     {
+        giveUpText.gameObject.SetActive(false);
+
         for(int i = 0; i < rows.Length; i ++)
         {
             for(int j = 0; j < rows[i].tiles.Length; j ++)
@@ -213,15 +230,15 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    private void OnDisable()
-    {
-        newWordBtn.gameObject.SetActive(true);
-        tryAgainBtn.gameObject.SetActive(true);
-    }
-
     private void OnEnable()
     {
         newWordBtn.gameObject.SetActive(false);
-        tryAgainBtn.gameObject.SetActive(false);
+        giveUpBtn.gameObject.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        newWordBtn.gameObject.SetActive(true);
+        giveUpBtn.gameObject.SetActive(true);
     }
 }
